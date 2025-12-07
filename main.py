@@ -6,6 +6,7 @@ import PPlay as pplay
 
 import config
 import random
+
 from player import Player
 from obstacle import Obstaculo
 
@@ -65,11 +66,13 @@ def game_over(janela, teclado, pontuacao_final, high_score, background):
         return config.MENU
     return config.GAME_OVER
 
-def jogar(janela, teclado, audios, background):
+def jogar(janela, teclado, audios, backgrounds):
     jogador = Player(janela)
     obstaculos = []
     
     pontuacao = 0.0
+    background_index = 0
+    ultimo_nivel = 0
     
     velocidade_atual = config.VELOCIDADE_INICIAL_OBSTACULO
     frequencia_spawn_atual = config.FREQUENCIA_SPAWN_INICIAL
@@ -85,7 +88,13 @@ def jogar(janela, teclado, audios, background):
         if jogador.update(teclado):
             audios["mudar_cor"].play()
 
-        pontuacao += 10 * delta_time 
+        pontuacao += 10 * delta_time
+        
+        nivel_atual = int(pontuacao // config.PONTOS_TROCA_BACKGROUND)
+        if nivel_atual > ultimo_nivel:
+            background_index = nivel_atual % len(backgrounds)
+            ultimo_nivel = nivel_atual
+        
         timer_spawn += delta_time
         timer_dificuldade += delta_time
         
@@ -113,7 +122,7 @@ def jogar(janela, teclado, audios, background):
             if obs.esta_fora_tela():
                 obstaculos.remove(obs)
         
-        background.draw()
+        backgrounds[background_index].draw()
 
         jogador.draw()
         for obs in obstaculos:
@@ -130,14 +139,17 @@ def main():
     janela.set_title("Correndo pela Aquarela")
     teclado = pplay.keyboard.Keyboard()
     
-    background = GameImage(config.BACKGROUND)
-    background.image = pplay.window.pygame.transform.scale(
-        background.image, 
-        (config.LARGURA, config.ALTURA)
-    )
-    background.width = config.LARGURA
-    background.height = config.ALTURA
-    background.set_position(0, 0)
+    backgrounds = []
+    for bg_path in config.BACKGROUNDS:
+        bg = GameImage(bg_path)
+        bg.image = pplay.window.pygame.transform.scale(
+            bg.image, 
+            (config.LARGURA, config.ALTURA)
+        )
+        bg.width = config.LARGURA
+        bg.height = config.ALTURA
+        bg.set_position(0, 0)
+        backgrounds.append(bg)
     
     try:
         audios = {
@@ -156,10 +168,10 @@ def main():
 
     while True:
         if game_state == config.MENU:
-            game_state = menu(janela, teclado, high_score, background)
+            game_state = menu(janela, teclado, high_score, backgrounds[0])
             
         elif game_state == config.JOGANDO:
-            game_state, pontuacao_final = jogar(janela, teclado, audios, background)
+            game_state, pontuacao_final = jogar(janela, teclado, audios, backgrounds)
             
             if pontuacao_final > high_score:
                 audios["recorde"].play() 
@@ -167,7 +179,7 @@ def main():
                 salvar_high_score(high_score)
                 
         elif game_state == config.GAME_OVER:
-            game_state = game_over(janela, teclado, pontuacao_final, high_score, background)
+            game_state = game_over(janela, teclado, pontuacao_final, high_score, backgrounds[0])
             
         janela.update()
 

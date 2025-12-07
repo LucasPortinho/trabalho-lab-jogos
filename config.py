@@ -47,6 +47,12 @@ AUDIO_FALHA = "audio/falha.mp3"
 AUDIO_RECORDE = "audio/recorde.mp3"
 
 BACKGROUND = "assets/background.jpg"
+BACKGROUND_2 = "assets/background_2.jpg"
+BACKGROUND_3 = "assets/background_3.jpg"
+BACKGROUNDS = [BACKGROUND, BACKGROUND_2, BACKGROUND_3]
+
+PONTOS_TROCA_BACKGROUND = 150
+
 BONECO_VERMELHO = "assets/boneco_vermelho.png"
 BONECO_VERDE = "assets/boneco_verde.png"
 BONECO_AZUL = "assets/boneco_azul.png"
