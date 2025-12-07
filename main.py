@@ -1,5 +1,7 @@
 from PPlay.gameimage import GameImage
 
+import PPlay.sound
+
 import PPlay as pplay
 
 import config
